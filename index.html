@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taqsimlovchi Shlyapa</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: var(--tg-theme-bg-color, #1a1a1a);
+            color: var(--tg-theme-text-color, #ffffff);
+            padding: 20px;
+            margin: 0;
+            line-height: 1.5;
+        }
+        .question-container { display: none; }
+        .question-container.active { display: block; animation: fadeIn 0.4s; }
+        h3 { font-size: 18px; margin-bottom: 20px; }
+        button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            background-color: var(--tg-theme-button-color, #ffb100);
+            color: var(--tg-theme-button-text-color, #000);
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: left;
+            cursor: pointer;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="q1" class="question-container active">
+        <h3>1. O'rmonda adashib qoldingiz va yo'lda ikki chorrahaga keldingiz. Qaysi yo'lni tanlaysiz?</h3>
+        <button onclick="answer('Slytherin')">A) Qorong'i, xavfli ko'rinsa ham, eng qisqa yo'lni</button>
+        <button onclick="answer('Hufflepuff')">B) Yorug' va xavfsiz, lekin uzoqroq yo'lni</button>
+        <button onclick="answer('Ravenclaw')">C) Qadimgi yozuvlar tushirilgan noma'lum so'qmoqni</button>
+        <button onclick="answer('Gryffindor')">D) Qanday xavf bo'lmasin, tavakkal qilib to'g'riga yuraman</button>
+    </div>
+
+    <div id="q2" class="question-container">
+        <h3>2. Sehrgarlar olamida qanday nom bilan tarixda qolishni xohlaysiz?</h3>
+        <button onclick="answer('Slytherin')">A) "Eng buyuk va qudratli"</button>
+        <button onclick="answer('Ravenclaw')">B) "Eng dono va bilimli"</button>
+        <button onclick="answer('Hufflepuff')">C) "Eng mehribon va adolatli"</button>
+        <button onclick="answer('Gryffindor')">D) "Eng jasur va qahramon"</button>
+    </div>
+
+    <div id="q3" class="question-container">
+        <h3>3. Imtihonda sinfdoshingiz ko'chirmakashlik (shpargalka) qilayotganini ko'rib qoldingiz. Nima qilasiz?</h3>
+        <button onclick="answer('Ravenclaw')">A) O'qituvchiga aytaman, qoidalar hamma uchun teng</button>
+        <button onclick="answer('Slytherin')">B) E'tibor bermayman. Kerak bo'lsa, men ham foydalanaman</button>
+        <button onclick="answer('Hufflepuff')">C) Imtihondan so'ng unga birga tayyorlanishni taklif qilaman</button>
+        <button onclick="answer('Gryffindor')">D) O'qituvchi ko'rmasdan oldin uni yashirishga yordam beraman</button>
+    </div>
+
+    <div id="q4" class="question-container">
+        <h3>4. Sizga bitta sehrli buyum tanlash imkoni berildi. Qaysi birini olasiz?</h3>
+        <button onclick="answer('Gryffindor')">A) Har qanday dushmanni yengadigan qilich</button>
+        <button onclick="answer('Ravenclaw')">B) Har qanday sirni ochuvchi ko'zgu</button>
+        <button onclick="answer('Slytherin')">C) Barcha tillarda gaplashish imkonini beruvchi uzuk</button>
+        <button onclick="answer('Hufflepuff')">D) Har qanday kasallikni davolovchi tumor</button>
+    </div>
+
+    <div id="q5" class="question-container">
+        <h3>5. Agar sizning eng yaqin do'stingizga xavf tug'ilsa, qanday yo'l tutasiz?</h3>
+        <button onclick="answer('Gryffindor')">A) O'zimni o'ylamasdan darhol jangga kiraman</button>
+        <button onclick="answer('Ravenclaw')">B) Xavfni baholab, aqlli strategiya tuzaman</button>
+        <button onclick="answer('Slytherin')">C) Yordam chaqirish uchun xavfsiz joyga qochaman</button>
+        <button onclick="answer('Hufflepuff')">D) Do'stimning yonida qolib, oxirigacha himoya qilaman</button>
+    </div>
+
+    <script>
+        // Telegram bilan bog'lanish va ekranni to'liq ochish
+        const tg = window.Telegram.WebApp;
+        tg.expand(); 
+
+        let scores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
+        let currentQuestion = 1;
+
+        function answer(house) {
+            scores[house]++; // Tanlangan fakultetga 1 ball qo'shish
+            
+            document.getElementById('q' + currentQuestion).classList.remove('active');
+            currentQuestion++;
+            
+            if (currentQuestion <= 5) {
+                document.getElementById('q' + currentQuestion).classList.add('active');
+            } else {
+                finishTest();
+            }
+        }
+
+        function finishTest() {
+            let maxScore = 0;
+            let finalHouse = 'Gryffindor'; // Zaxira variant
+            
+            // Eng ko'p ball yig'gan fakultetni aniqlash
+            for (let house in scores) {
+                if (scores[house] > maxScore) {
+                    maxScore = scores[house];
+                    finalHouse = house;
+                }
+            }
+            
+            // Botga natijani yuborish va WebApp ni yopish
+            tg.sendData(finalHouse);
+        }
+    </script>
+</body>
+</html>
