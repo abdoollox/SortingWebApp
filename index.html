@@ -19,6 +19,7 @@
         .question-container.active { display: block; animation: fadeIn 0.3s; }
         h3 { font-size: 18px; margin-bottom: 20px; }
         
+        /* Savol rasmlari dizayni */
         .question-image {
             width: 100%;
             max-height: 250px;
@@ -44,7 +45,7 @@
             transition: 0.2s;
         }
         
-        /* Tanlangan variant dizayni (Betaraf va sirli) */
+        /* Tanlangan variant dizayni (Betaraf oq porlash) */
         .option-btn.selected {
             background-color: #ffffff;
             color: #000000;
@@ -54,7 +55,7 @@
             box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
         }
 
-        /* Pastki tugmalar (Orqaga / Oldinga) */
+        /* Pastki navigatsiya tugmalari */
         .nav-controls {
             display: flex;
             justify-content: space-between;
@@ -73,9 +74,32 @@
         .next-btn { background-color: #28a745; color: #fff; }
         .next-btn:disabled { background-color: #2a4030; color: #777; cursor: not-allowed; }
 
-        /* Natija ekrani dizayni */
-        .result-title { text-align: center; font-size: 24px; margin-top: 20px; }
-        .result-emoji { font-size: 80px; text-align: center; margin: 10px 0; display: block; }
+        /* Natija ekrani dizayni (YANGI) */
+        .result-title { text-align: center; font-size: 18px; color: #ccc; margin-top: 10px; margin-bottom: 5px; }
+        
+        /* Natija rasmi (Fakultet gerbi) */
+        .result-image {
+            width: 80%;
+            max-height: 200px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        
+        /* Fakultet nomi matni (YANGI, rangi JS da o'zgaradi) */
+        .result-house-name {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        }
+
         .submit-btn {
             display: block;
             width: 100%;
@@ -86,7 +110,7 @@
             border-radius: 10px;
             font-size: 18px;
             font-weight: bold;
-            margin-top: 30px;
+            margin-top: 25px;
             cursor: pointer;
             animation: pulse 1.5s infinite;
         }
@@ -95,7 +119,7 @@
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
     </style>
 </head>
-<body>
+<body onload="preloadResultImages()">
 
     <div id="q1" class="question-container active">
         <img src="q1.jpg" alt="Savol 1" class="question-image">
@@ -163,10 +187,14 @@
     </div>
 
     <div id="result-screen" class="question-container">
-        <h2 class="result-title">Sizning fakultetingiz:</h2>
-        <span id="result-emoji" class="result-emoji">❓</span>
-        <h1 id="result-house-name" style="text-align: center; color: #ffb100;">Loading...</h1>
-        <p style="text-align: center; color: #ccc;">Natijangiz saqlanishi va guruhga yuborilishi uchun pastdagi tugmani bosing!</p>
+        <p class="result-title">Sizning fakultetingiz:</p>
+        
+        <img id="result-image" src="" alt="Fakultet gerbi" class="result-image">
+        
+        <h1 id="result-house-name" class="result-house-name">Loading...</h1>
+        
+        <p style="text-align: center; color: #ccc; font-size: 13px; padding: 0 10px;">Natijangiz saqlanishi va guruhga yuborilishi uchun pastdagi tugmani bosing!</p>
+        
         <button class="submit-btn" onclick="sendToBot()">Natijani Tasdiqlash va Botga Yuborish 📨</button>
     </div>
 
@@ -174,30 +202,49 @@
         const tg = window.Telegram.WebApp;
         tg.expand(); 
 
-        // Har bir savol uchun tanlovni alohida saqlaymiz (orqaga qaytganda eski ball buzilmasligi uchun)
         let userChoices = [null, null, null, null, null]; 
         let finalHouseResult = '';
 
+        // Natija rasmlari va ranglari xaritasi (Ma'lumotlar bazasi)
+        const houseDataConfig = {
+            'Gryffindor': {
+                'img': 'Gryffindor_crest.png', // GitHub dagi rasm nomi
+                'color': '#ae0001' // To'q qizil
+            },
+            'Slytherin': {
+                'img': 'Slytherin_crest.png',
+                'color': '#2a623d' // To'q yashil
+            },
+            'Ravenclaw': {
+                'img': 'Ravenclaw_crest.png',
+                'color': '#005a9c' // To'q ko'k
+            },
+            'Hufflepuff': {
+                'img': 'Hufflepuff_crest.png',
+                'color': '#ecb939' // Oltin sariq
+            }
+        };
+
+        // MUHIM: Rasmlarni orqa fonda yuklash funksiyasi
+        function preloadResultImages() {
+            for (let house in houseDataConfig) {
+                let img = new Image();
+                img.src = houseDataConfig[house].img;
+            }
+        }
+
         function selectOption(qNum, house, btnElement) {
-            // 1. Shu savoldagi barcha tugmalardan 'selected' klassini olib tashlash
             let container = document.getElementById('q' + qNum);
             let buttons = container.querySelectorAll('.option-btn');
             buttons.forEach(btn => btn.classList.remove('selected'));
-
-            // 2. Bosilgan tugmani belgilash
             btnElement.classList.add('selected');
-
-            // 3. Xotiraga yozish (Array index 0 dan boshlangani uchun qNum - 1)
             userChoices[qNum - 1] = house;
-
-            // 4. "Keyingisi" tugmasini yoqish
             document.getElementById('next' + qNum).disabled = false;
         }
 
         function nextQuestion(qNum) {
             document.getElementById('q' + qNum).classList.remove('active');
             let nextQ = qNum + 1;
-            
             if (nextQ <= 5) {
                 document.getElementById('q' + nextQ).classList.add('active');
             } else {
@@ -212,37 +259,32 @@
 
         function calculateAndShowResult() {
             let scores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
-            
-            // Xotiradagi javoblarni sanaymiz
-            userChoices.forEach(choice => {
-                if(choice) scores[choice]++;
-            });
+            userChoices.forEach(choice => { if(choice) scores[choice]++; });
             
             let maxScore = 0;
             let finalHouse = 'Gryffindor'; 
-            
             for (let house in scores) {
-                if (scores[house] > maxScore) {
-                    maxScore = scores[house];
-                    finalHouse = house;
-                }
+                if (scores[house] > maxScore) { maxScore = scores[house]; finalHouse = house; }
             }
             
             finalHouseResult = finalHouse;
             
-            // UI ni yangilash (Natija ekrani)
-            let emojis = { 'Gryffindor': '🦁', 'Slytherin': '🐍', 'Ravenclaw': '🦅', 'Hufflepuff': '🦡' };
+            // --- UI NI YANGILASH (YANGI MANTIQ) ---
+            const config = houseDataConfig[finalHouse];
+            
+            // 1. Matnni yangilash
             document.getElementById('result-house-name').innerText = finalHouse;
-            document.getElementById('result-emoji').innerText = emojis[finalHouse];
+            
+            // 2. Matn rangini o'zgartirish (Siz xohlagandek)
+            document.getElementById('result-house-name').style.color = config.color;
+            
+            // 3. Rasmni o'zgartirish (Emoji emas, rasm)
+            document.getElementById('result-image').src = config.img;
             
             document.getElementById('result-screen').classList.add('active');
         }
 
-        function sendToBot() {
-            // Va nihoyat ma'lumotni Telegramga yuborish
-            tg.sendData(finalHouseResult);
-        }
+        function sendToBot() { tg.sendData(finalHouseResult); }
     </script>
 </body>
 </html>
-
