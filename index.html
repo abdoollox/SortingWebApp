@@ -13,12 +13,12 @@
             padding: 20px;
             margin: 0;
             line-height: 1.5;
+            padding-bottom: 40px;
         }
         .question-container { display: none; }
-        .question-container.active { display: block; animation: fadeIn 0.4s; }
+        .question-container.active { display: block; animation: fadeIn 0.3s; }
         h3 { font-size: 18px; margin-bottom: 20px; }
         
-        /* YANGI: Rasmlar uchun chiroyli dizayn */
         .question-image {
             width: 100%;
             max-height: 250px;
@@ -26,26 +26,72 @@
             border-radius: 12px;
             margin-bottom: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            border: 2px solid #444; /* Qorong'i ramka */
+            border: 2px solid #444;
         }
 
-        button {
+        .option-btn {
             display: block;
             width: 100%;
             margin: 10px 0;
             padding: 15px;
-            background-color: var(--tg-theme-button-color, #ffb100);
-            color: var(--tg-theme-button-text-color, #000);
-            border: none;
+            background-color: #333;
+            color: #fff;
+            border: 2px solid transparent;
             border-radius: 8px;
             font-size: 15px;
-            font-weight: bold;
             text-align: left;
             cursor: pointer;
             transition: 0.2s;
         }
-        button:active { transform: scale(0.98); opacity: 0.8; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Tanlangan variant dizayni */
+        .option-btn.selected {
+            background-color: #ffb100;
+            color: #000;
+            border: 2px solid #fff;
+            font-weight: bold;
+            transform: scale(1.02);
+        }
+
+        /* Pastki tugmalar (Orqaga / Oldinga) */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .nav-btn {
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            width: 48%;
+            font-size: 14px;
+        }
+        .back-btn { background-color: #555; color: #fff; }
+        .next-btn { background-color: #28a745; color: #fff; }
+        .next-btn:disabled { background-color: #2a4030; color: #777; cursor: not-allowed; }
+
+        /* Natija ekrani dizayni */
+        .result-title { text-align: center; font-size: 24px; margin-top: 20px; }
+        .result-emoji { font-size: 80px; text-align: center; margin: 10px 0; display: block; }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            cursor: pointer;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -53,69 +99,124 @@
     <div id="q1" class="question-container active">
         <img src="q1.jpg" alt="Savol 1" class="question-image">
         <h3>1. O'rmonda adashib qoldingiz va yo'lda ikki chorrahaga keldingiz. Qaysi yo'lni tanlaysiz?</h3>
-        <button onclick="answer('Slytherin')">A) Qorong'i, xavfli ko'rinsa ham, eng qisqa yo'lni</button>
-        <button onclick="answer('Hufflepuff')">B) Yorug' va xavfsiz, lekin uzoqroq yo'lni</button>
-        <button onclick="answer('Ravenclaw')">C) Qadimgi yozuvlar tushirilgan noma'lum so'qmoqni</button>
-        <button onclick="answer('Gryffindor')">D) Qanday xavf bo'lmasin, tavakkal qilib to'g'riga yuraman</button>
+        <button class="option-btn" onclick="selectOption(1, 'Slytherin', this)">A) Qorong'i, xavfli ko'rinsa ham, eng qisqa yo'lni</button>
+        <button class="option-btn" onclick="selectOption(1, 'Hufflepuff', this)">B) Yorug' va xavfsiz, lekin uzoqroq yo'lni</button>
+        <button class="option-btn" onclick="selectOption(1, 'Ravenclaw', this)">C) Qadimgi yozuvlar tushirilgan noma'lum so'qmoqni</button>
+        <button class="option-btn" onclick="selectOption(1, 'Gryffindor', this)">D) Qanday xavf bo'lmasin, tavakkal qilib to'g'riga yuraman</button>
+        <div class="nav-controls">
+            <button class="nav-btn back-btn" style="visibility: hidden;">⬅️ Orqaga</button>
+            <button id="next1" class="nav-btn next-btn" disabled onclick="nextQuestion(1)">Keyingisi ➡️</button>
+        </div>
     </div>
 
     <div id="q2" class="question-container">
         <img src="q2.jpg" alt="Savol 2" class="question-image">
         <h3>2. Sehrgarlar olamida qanday nom bilan tarixda qolishni xohlaysiz?</h3>
-        <button onclick="answer('Slytherin')">A) "Eng buyuk va qudratli"</button>
-        <button onclick="answer('Ravenclaw')">B) "Eng dono va bilimli"</button>
-        <button onclick="answer('Hufflepuff')">C) "Eng mehribon va adolatli"</button>
-        <button onclick="answer('Gryffindor')">D) "Eng jasur va qahramon"</button>
+        <button class="option-btn" onclick="selectOption(2, 'Slytherin', this)">A) "Eng buyuk va qudratli"</button>
+        <button class="option-btn" onclick="selectOption(2, 'Ravenclaw', this)">B) "Eng dono va bilimli"</button>
+        <button class="option-btn" onclick="selectOption(2, 'Hufflepuff', this)">C) "Eng mehribon va adolatli"</button>
+        <button class="option-btn" onclick="selectOption(2, 'Gryffindor', this)">D) "Eng jasur va qahramon"</button>
+        <div class="nav-controls">
+            <button class="nav-btn back-btn" onclick="prevQuestion(2)">⬅️ Orqaga</button>
+            <button id="next2" class="nav-btn next-btn" disabled onclick="nextQuestion(2)">Keyingisi ➡️</button>
+        </div>
     </div>
 
     <div id="q3" class="question-container">
         <img src="q3.jpg" alt="Savol 3" class="question-image">
         <h3>3. Imtihonda sinfdoshingiz ko'chirmakashlik (shpargalka) qilayotganini ko'rib qoldingiz. Nima qilasiz?</h3>
-        <button onclick="answer('Ravenclaw')">A) O'qituvchiga aytaman, qoidalar hamma uchun teng</button>
-        <button onclick="answer('Slytherin')">B) E'tibor bermayman. Kerak bo'lsa, men ham foydalanaman</button>
-        <button onclick="answer('Hufflepuff')">C) Imtihondan so'ng unga birga tayyorlanishni taklif qilaman</button>
-        <button onclick="answer('Gryffindor')">D) O'qituvchi ko'rmasdan oldin uni yashirishga yordam beraman</button>
+        <button class="option-btn" onclick="selectOption(3, 'Ravenclaw', this)">A) O'qituvchiga aytaman, qoidalar hamma uchun teng</button>
+        <button class="option-btn" onclick="selectOption(3, 'Slytherin', this)">B) E'tibor bermayman. Kerak bo'lsa, men ham foydalanaman</button>
+        <button class="option-btn" onclick="selectOption(3, 'Hufflepuff', this)">C) Imtihondan so'ng unga birga tayyorlanishni taklif qilaman</button>
+        <button class="option-btn" onclick="selectOption(3, 'Gryffindor', this)">D) O'qituvchi ko'rmasdan oldin uni yashirishga yordam beraman</button>
+        <div class="nav-controls">
+            <button class="nav-btn back-btn" onclick="prevQuestion(3)">⬅️ Orqaga</button>
+            <button id="next3" class="nav-btn next-btn" disabled onclick="nextQuestion(3)">Keyingisi ➡️</button>
+        </div>
     </div>
 
     <div id="q4" class="question-container">
         <img src="q4.jpg" alt="Savol 4" class="question-image">
         <h3>4. Sizga bitta sehrli buyum tanlash imkoni berildi. Qaysi birini olasiz?</h3>
-        <button onclick="answer('Gryffindor')">A) Har qanday dushmanni yengadigan qilich</button>
-        <button onclick="answer('Ravenclaw')">B) Har qanday sirni ochuvchi ko'zgu</button>
-        <button onclick="answer('Slytherin')">C) Barcha tillarda gaplashish imkonini beruvchi uzuk</button>
-        <button onclick="answer('Hufflepuff')">D) Har qanday kasallikni davolovchi tumor</button>
+        <button class="option-btn" onclick="selectOption(4, 'Gryffindor', this)">A) Har qanday dushmanni yengadigan qilich</button>
+        <button class="option-btn" onclick="selectOption(4, 'Ravenclaw', this)">B) Har qanday sirni ochuvchi ko'zgu</button>
+        <button class="option-btn" onclick="selectOption(4, 'Slytherin', this)">C) Barcha tillarda gaplashish imkonini beruvchi uzuk</button>
+        <button class="option-btn" onclick="selectOption(4, 'Hufflepuff', this)">D) Har qanday kasallikni davolovchi tumor</button>
+        <div class="nav-controls">
+            <button class="nav-btn back-btn" onclick="prevQuestion(4)">⬅️ Orqaga</button>
+            <button id="next4" class="nav-btn next-btn" disabled onclick="nextQuestion(4)">Keyingisi ➡️</button>
+        </div>
     </div>
 
     <div id="q5" class="question-container">
         <img src="q5.jpg" alt="Savol 5" class="question-image">
         <h3>5. Agar sizning eng yaqin do'stingizga xavf tug'ilsa, qanday yo'l tutasiz?</h3>
-        <button onclick="answer('Gryffindor')">A) O'zimni o'ylamasdan darhol jangga kiraman</button>
-        <button onclick="answer('Ravenclaw')">B) Xavfni baholab, aqlli strategiya tuzaman</button>
-        <button onclick="answer('Slytherin')">C) Yordam chaqirish uchun xavfsiz joyga qochaman</button>
-        <button onclick="answer('Hufflepuff')">D) Do'stimning yonida qolib, oxirigacha himoya qilaman</button>
+        <button class="option-btn" onclick="selectOption(5, 'Gryffindor', this)">A) O'zimni o'ylamasdan darhol jangga kiraman</button>
+        <button class="option-btn" onclick="selectOption(5, 'Ravenclaw', this)">B) Xavfni baholab, aqlli strategiya tuzaman</button>
+        <button class="option-btn" onclick="selectOption(5, 'Slytherin', this)">C) Yordam chaqirish uchun xavfsiz joyga qochaman</button>
+        <button class="option-btn" onclick="selectOption(5, 'Hufflepuff', this)">D) Do'stimning yonida qolib, oxirigacha himoya qilaman</button>
+        <div class="nav-controls">
+            <button class="nav-btn back-btn" onclick="prevQuestion(5)">⬅️ Orqaga</button>
+            <button id="next5" class="nav-btn next-btn" disabled onclick="nextQuestion(5)">Natijani ko'rish 🪄</button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="question-container">
+        <h2 class="result-title">Sizning fakultetingiz:</h2>
+        <span id="result-emoji" class="result-emoji">❓</span>
+        <h1 id="result-house-name" style="text-align: center; color: #ffb100;">Loading...</h1>
+        <p style="text-align: center; color: #ccc;">Natijangiz saqlanishi va guruhga yuborilishi uchun pastdagi tugmani bosing!</p>
+        <button class="submit-btn" onclick="sendToBot()">Natijani Tasdiqlash va Botga Yuborish 📨</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); 
 
-        let scores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
-        let currentQuestion = 1;
+        // Har bir savol uchun tanlovni alohida saqlaymiz (orqaga qaytganda eski ball buzilmasligi uchun)
+        let userChoices = [null, null, null, null, null]; 
+        let finalHouseResult = '';
 
-        function answer(house) {
-            scores[house]++;
+        function selectOption(qNum, house, btnElement) {
+            // 1. Shu savoldagi barcha tugmalardan 'selected' klassini olib tashlash
+            let container = document.getElementById('q' + qNum);
+            let buttons = container.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+
+            // 2. Bosilgan tugmani belgilash
+            btnElement.classList.add('selected');
+
+            // 3. Xotiraga yozish (Array index 0 dan boshlangani uchun qNum - 1)
+            userChoices[qNum - 1] = house;
+
+            // 4. "Keyingisi" tugmasini yoqish
+            document.getElementById('next' + qNum).disabled = false;
+        }
+
+        function nextQuestion(qNum) {
+            document.getElementById('q' + qNum).classList.remove('active');
+            let nextQ = qNum + 1;
             
-            document.getElementById('q' + currentQuestion).classList.remove('active');
-            currentQuestion++;
-            
-            if (currentQuestion <= 5) {
-                document.getElementById('q' + currentQuestion).classList.add('active');
+            if (nextQ <= 5) {
+                document.getElementById('q' + nextQ).classList.add('active');
             } else {
-                finishTest();
+                calculateAndShowResult();
             }
         }
 
-        function finishTest() {
+        function prevQuestion(qNum) {
+            document.getElementById('q' + qNum).classList.remove('active');
+            document.getElementById('q' + (qNum - 1)).classList.add('active');
+        }
+
+        function calculateAndShowResult() {
+            let scores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
+            
+            // Xotiradagi javoblarni sanaymiz
+            userChoices.forEach(choice => {
+                if(choice) scores[choice]++;
+            });
+            
             let maxScore = 0;
             let finalHouse = 'Gryffindor'; 
             
@@ -125,7 +226,20 @@
                     finalHouse = house;
                 }
             }
-            tg.sendData(finalHouse);
+            
+            finalHouseResult = finalHouse;
+            
+            // UI ni yangilash (Natija ekrani)
+            let emojis = { 'Gryffindor': '🦁', 'Slytherin': '🐍', 'Ravenclaw': '🦅', 'Hufflepuff': '🦡' };
+            document.getElementById('result-house-name').innerText = finalHouse;
+            document.getElementById('result-emoji').innerText = emojis[finalHouse];
+            
+            document.getElementById('result-screen').classList.add('active');
+        }
+
+        function sendToBot() {
+            // Va nihoyat ma'lumotni Telegramga yuborish
+            tg.sendData(finalHouseResult);
         }
     </script>
 </body>
