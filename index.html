@@ -17,6 +17,18 @@
         .question-container { display: none; }
         .question-container.active { display: block; animation: fadeIn 0.4s; }
         h3 { font-size: 18px; margin-bottom: 20px; }
+        
+        /* YANGI: Rasmlar uchun chiroyli dizayn */
+        .question-image {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 2px solid #444; /* Qorong'i ramka */
+        }
+
         button {
             display: block;
             width: 100%;
@@ -30,13 +42,16 @@
             font-weight: bold;
             text-align: left;
             cursor: pointer;
+            transition: 0.2s;
         }
+        button:active { transform: scale(0.98); opacity: 0.8; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="q1" class="question-container active">
+        <img src="q1.jpg" alt="Savol 1" class="question-image">
         <h3>1. O'rmonda adashib qoldingiz va yo'lda ikki chorrahaga keldingiz. Qaysi yo'lni tanlaysiz?</h3>
         <button onclick="answer('Slytherin')">A) Qorong'i, xavfli ko'rinsa ham, eng qisqa yo'lni</button>
         <button onclick="answer('Hufflepuff')">B) Yorug' va xavfsiz, lekin uzoqroq yo'lni</button>
@@ -45,6 +60,7 @@
     </div>
 
     <div id="q2" class="question-container">
+        <img src="q2.jpg" alt="Savol 2" class="question-image">
         <h3>2. Sehrgarlar olamida qanday nom bilan tarixda qolishni xohlaysiz?</h3>
         <button onclick="answer('Slytherin')">A) "Eng buyuk va qudratli"</button>
         <button onclick="answer('Ravenclaw')">B) "Eng dono va bilimli"</button>
@@ -53,6 +69,7 @@
     </div>
 
     <div id="q3" class="question-container">
+        <img src="q3.jpg" alt="Savol 3" class="question-image">
         <h3>3. Imtihonda sinfdoshingiz ko'chirmakashlik (shpargalka) qilayotganini ko'rib qoldingiz. Nima qilasiz?</h3>
         <button onclick="answer('Ravenclaw')">A) O'qituvchiga aytaman, qoidalar hamma uchun teng</button>
         <button onclick="answer('Slytherin')">B) E'tibor bermayman. Kerak bo'lsa, men ham foydalanaman</button>
@@ -61,6 +78,7 @@
     </div>
 
     <div id="q4" class="question-container">
+        <img src="q4.jpg" alt="Savol 4" class="question-image">
         <h3>4. Sizga bitta sehrli buyum tanlash imkoni berildi. Qaysi birini olasiz?</h3>
         <button onclick="answer('Gryffindor')">A) Har qanday dushmanni yengadigan qilich</button>
         <button onclick="answer('Ravenclaw')">B) Har qanday sirni ochuvchi ko'zgu</button>
@@ -69,6 +87,7 @@
     </div>
 
     <div id="q5" class="question-container">
+        <img src="q5.jpg" alt="Savol 5" class="question-image">
         <h3>5. Agar sizning eng yaqin do'stingizga xavf tug'ilsa, qanday yo'l tutasiz?</h3>
         <button onclick="answer('Gryffindor')">A) O'zimni o'ylamasdan darhol jangga kiraman</button>
         <button onclick="answer('Ravenclaw')">B) Xavfni baholab, aqlli strategiya tuzaman</button>
@@ -77,7 +96,6 @@
     </div>
 
     <script>
-        // Telegram bilan bog'lanish va ekranni to'liq ochish
         const tg = window.Telegram.WebApp;
         tg.expand(); 
 
@@ -85,7 +103,7 @@
         let currentQuestion = 1;
 
         function answer(house) {
-            scores[house]++; // Tanlangan fakultetga 1 ball qo'shish
+            scores[house]++;
             
             document.getElementById('q' + currentQuestion).classList.remove('active');
             currentQuestion++;
@@ -99,17 +117,14 @@
 
         function finishTest() {
             let maxScore = 0;
-            let finalHouse = 'Gryffindor'; // Zaxira variant
+            let finalHouse = 'Gryffindor'; 
             
-            // Eng ko'p ball yig'gan fakultetni aniqlash
             for (let house in scores) {
                 if (scores[house] > maxScore) {
                     maxScore = scores[house];
                     finalHouse = house;
                 }
             }
-            
-            // Botga natijani yuborish va WebApp ni yopish
             tg.sendData(finalHouse);
         }
     </script>
