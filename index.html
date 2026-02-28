@@ -77,7 +77,7 @@
         /* Natija ekrani dizayni (YANGI) */
         .result-title { text-align: center; font-size: 18px; color: #ccc; margin-top: 10px; margin-bottom: 5px; }
         
-        /* Natija rasmi (Fakultet gerbi) */
+        /* Natija rasmi (Fakultet gerbi) - RAMKASIZ VE MINIMALIST */
         .result-image {
             width: 80%;
             max-height: 200px;
@@ -86,7 +86,7 @@
             margin: 0 auto;
             margin-bottom: 10px;
             border-radius: 10px;
-            border: 1px solid #333;
+            border: none; /* Ramkani butunlay olib tashlaymiz */
         }
         
         /* Fakultet nomi matni (YANGI, rangi JS da o'zgaradi) */
@@ -281,6 +281,11 @@
             // 3. Rasmni o'zgartirish (Emoji emas, rasm)
             document.getElementById('result-image').src = config.img;
             
+            // ⚠️ YANGI O'ZGARISH: TUGMANI DINAMIK MOSLASHTIRISH
+            let submitBtn = document.querySelector('.submit-btn');
+            submitBtn.innerText = finalHouse + " fakultetini qabul qilish 🪄"; // Matn o'zgaradi
+            submitBtn.style.backgroundColor = config.color; // Rangi fakultet rangiga kiradi
+            
             document.getElementById('result-screen').classList.add('active');
         }
 
@@ -288,3 +293,4 @@
     </script>
 </body>
 </html>
+
