@@ -262,10 +262,26 @@
         }
 
         function sendToBot() { 
-            const botUsername = "taqsimlovchibot"; // <- O'ZINGNING BOTING YUZERINI YOZ
+            let submitBtn = document.querySelector('.submit-btn');
+            
+            // 1. SPAMDAN HIMOYA: Tugmani darhol o'chiramiz (Disable)
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Yuborilmoqda... ⏳";
+            submitBtn.style.opacity = "0.7";
+            submitBtn.style.animation = "none";
+            submitBtn.style.cursor = "not-allowed";
+
+            // 2. DEEP LINK: Botga natijani yuborish
+            const botUsername = "TaqsimlovchiShlyapa_bot"; // <- O'ZINGNING BOTING YUZERINI YOZ (Agar o'zgargan bo'lsa)
             tg.openTelegramLink(`https://t.me/${botUsername}?start=res_${finalHouseResult}`);
+            
+            // 3. MAJBURAN YOPISH: Android qotib qolmasligi uchun
+            setTimeout(() => {
+                tg.close();
+            }, 100); // 0.1 soniyadan keyin oynani shafqatsizlarcha yopamiz
         }
     </script>
 </body>
 </html>
+
 
