@@ -235,9 +235,14 @@
             document.getElementById('q' + (qNum - 1)).classList.add('active');
         }
 
+        // Global o'zgaruvchilarga ballarni ham qo'shamiz
+        let finalScores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
+
         function calculateAndShowResult() {
             let scores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
             userChoices.forEach(choice => { if(choice) scores[choice]++; });
+            
+            finalScores = scores; // Buni botga yuborish uchun saqlab qo'yamiz
             
             let maxScore = 0;
             let finalHouse = 'Gryffindor'; 
@@ -247,7 +252,6 @@
             finalHouseResult = finalHouse;
             
             const config = houseDataConfig[finalHouse];
-            
             document.getElementById('result-house-name').innerText = finalHouse;
             document.getElementById('result-house-name').style.color = config.color;
             document.getElementById('result-image').src = config.img;
@@ -256,33 +260,32 @@
             submitBtn.innerText = finalHouse + " fakultetini qabul qilish 🪄";
             submitBtn.style.backgroundColor = config.color;
             
-            // Kutish ekranini yopib, Natijani ochamiz
             document.getElementById('loading-screen').classList.remove('active');
             document.getElementById('result-screen').classList.add('active');
         }
 
         function sendToBot() { 
             let submitBtn = document.querySelector('.submit-btn');
-            
-            // 1. SPAMDAN HIMOYA: Tugmani darhol o'chiramiz (Disable)
             submitBtn.disabled = true;
             submitBtn.innerText = "Yuborilmoqda... ⏳";
             submitBtn.style.opacity = "0.7";
             submitBtn.style.animation = "none";
             submitBtn.style.cursor = "not-allowed";
 
-            // 2. DEEP LINK: Botga natijani yuborish
-            const botUsername = "taqsimlovchibot"; // <- O'ZINGNING BOTING YUZERINI YOZ (Agar o'zgargan bo'lsa)
-            tg.openTelegramLink(`https://t.me/${botUsername}?start=res_${finalHouseResult}`);
+            const botUsername = "TaqsimlovchiShlyapa_bot"; // O'zingning boting
             
-            // 3. MAJBURAN YOPISH: Android qotib qolmasligi uchun
-            setTimeout(() => {
-                tg.close();
-            }, 100); // 0.1 soniyadan keyin oynani shafqatsizlarcha yopamiz
+            // MUHIM O'ZGARISH: Natija bilan birga ballarni ham yuboramiz
+            // Format: res_Gryffindor_3_1_1_0 (Asosiy_G_S_R_H)
+            let payload = `res_${finalHouseResult}_${finalScores.Gryffindor}_${finalScores.Slytherin}_${finalScores.Ravenclaw}_${finalScores.Hufflepuff}`;
+            
+            tg.openTelegramLink(`https://t.me/${botUsername}?start=${payload}`);
+            
+            setTimeout(() => { tg.close(); }, 100); 
         }
     </script>
 </body>
 </html>
+
 
 
 
