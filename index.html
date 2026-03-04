@@ -5,21 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taqsimlovchi Shlyapa</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
         body {
-            font-family: sans-serif;
-            background-color: var(--tg-theme-bg-color, #1a1a1a);
-            color: var(--tg-theme-text-color, #ffffff);
+            font-family: 'Nunito', sans-serif; /* Asosiy matnlar uchun */
+            background-color: var(--tg-theme-bg-color, #111);
+            color: var(--tg-theme-text-color, #e0e0e0);
             padding: 20px;
             margin: 0;
-            line-height: 1.5;
+            line-height: 1.6;
             padding-bottom: 40px;
+            background-image: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #111 70%); /* Sehrli fon effekti */
+            background-attachment: fixed;
         }
+
+        /* Sarlavhalar uchun klassik shrift */
+        h1, h2, h3, .result-house-name, .result-title, .intro-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+        }
+
         .question-container { display: none; }
-        /* Animatsiyalar */
-        .question-container.active { display: block; animation: fadeIn 0.4s; }
+        .question-container.active { display: block; animation: fadeIn 0.5s ease-out; }
         
-        h3 { font-size: 18px; margin-bottom: 20px; }
+        h3 { font-size: 19px; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
         .question-image {
             width: 100%;
@@ -27,77 +40,127 @@
             object-fit: cover;
             border-radius: 12px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            border: 2px solid #444;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.7);
+            border: 2px solid #333;
         }
 
         .option-btn {
             display: block;
             width: 100%;
             margin: 10px 0;
-            padding: 15px;
-            background-color: #333;
+            padding: 16px;
+            background: linear-gradient(145deg, #2a2a2a, #222);
             color: #fff;
-            border: 2px solid transparent;
-            border-radius: 8px;
+            border: 1px solid #444;
+            border-radius: 10px;
             font-size: 15px;
+            font-family: 'Nunito', sans-serif;
             text-align: left;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         
         .option-btn.selected {
-            background-color: #ffffff;
-            color: #000000;
-            border: 2px solid #ffffff;
-            font-weight: bold;
-            transform: scale(1.02);
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+            background: #fff;
+            color: #000;
+            border: 1px solid #fff;
+            font-weight: 800;
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
 
         .nav-controls {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 25px;
         }
         .nav-btn {
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
             border: none;
-            font-weight: bold;
+            font-weight: 800;
             cursor: pointer;
             width: 48%;
             font-size: 14px;
+            text-transform: uppercase;
+            font-family: 'Cinzel', serif;
         }
-        .back-btn { background-color: #555; color: #fff; }
-        .next-btn { background-color: #28a745; color: #fff; }
-        .next-btn:disabled { background-color: #2a4030; color: #777; cursor: not-allowed; }
+        .back-btn { background-color: #444; color: #ccc; }
+        .next-btn { background-color: #28a745; color: #fff; box-shadow: 0 0 10px rgba(40, 167, 69, 0.4); }
+        .next-btn:disabled { background-color: #222; color: #555; box-shadow: none; cursor: not-allowed; }
 
-        /* Intro va Kutish ekrani dizayni */
-        .intro-title { text-align: center; font-size: 24px; margin-bottom: 10px; }
-        .intro-text { text-align: center; font-size: 16px; color: #ccc; margin-bottom: 30px; }
-        .intro-emoji { font-size: 100px; text-align: center; display: block; margin: 20px 0; animation: float 3s ease-in-out infinite; }
-        .loading-spinner { font-size: 80px; text-align: center; display: block; margin: 40px 0; animation: spin 2s linear infinite; }
+        /* INTRO EKRANI DIZAYNI (YANGILANGAN) */
+        .intro-box {
+            background: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 40px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            text-align: center;
+            margin-top: 20px;
+        }
 
-        .result-title { text-align: center; font-size: 18px; color: #ccc; margin-top: 10px; margin-bottom: 5px; }
-        .result-image { width: 80%; max-height: 200px; object-fit: contain; display: block; margin: 0 auto; margin-bottom: 10px; border-radius: 10px; border: none; }
-        .result-house-name { text-align: center; font-size: 32px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 5px rgba(0,0,0,0.7); }
+        .intro-title { 
+            font-size: 26px; 
+            margin-bottom: 15px; 
+            background: linear-gradient(45deg, #ffd700, #ffb100);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .intro-text { font-size: 16px; color: #bbb; margin-bottom: 30px; }
+        
+        /* Shlyapa rasmi (Emoji o'rniga) */
+        .intro-hat-img {
+            width: 140px;
+            display: block;
+            margin: 0 auto 20px auto;
+            animation: float 4s ease-in-out infinite;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.8));
+        }
 
-        .submit-btn { display: block; width: 100%; padding: 18px; background-color: #0088cc; color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 25px; cursor: pointer; animation: pulse 1.5s infinite; }
+        .loading-spinner { font-size: 60px; text-align: center; display: block; margin: 40px 0; animation: spin 2s linear infinite; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+        .result-title { text-align: center; font-size: 20px; color: #ccc; margin-top: 10px; margin-bottom: 15px; }
+        .result-image { width: 85%; max-height: 220px; object-fit: contain; display: block; margin: 0 auto; margin-bottom: 15px; border-radius: 12px; border: none; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+        .result-house-name { text-align: center; font-size: 38px; margin: 0; text-transform: uppercase; letter-spacing: 3px; }
+
+        /* Sehrli Tugma (Oltin rang jilosi bilan) */
+        .magical-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #b8860b, #ffd700, #b8860b);
+            background-size: 200% 200%;
+            color: #111;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            margin-top: 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            animation: gradientShift 3s ease infinite, pulse 2s infinite;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     </style>
 </head>
 <body onload="preloadResultImages()">
 
-    <div id="intro-screen" class="question-container active">
-        <span class="intro-emoji">🎩</span>
-        <h1 class="intro-title">Hogwartsga xush kelibsiz!</h1>
+    <div id="intro-screen" class="question-container active intro-box">
+        <img src="sorting_hat.png" alt="Taqsimlovchi Shlyapa" class="intro-hat-img">
+        
+        <h1 class="intro-title">Hogwartsga Xush Kelibsiz</h1>
         <p class="intro-text">Taqsimlovchi shlyapa sizning xarakteringizni tahlil qilib, qaysi fakultetga munosib ekanligingizni aniqlaydi. Barcha savollarga xolisona javob bering.</p>
-        <button class="submit-btn" style="animation: none; background-color: #28a745;" onclick="startTest()">Testni boshlash 🪄</button>
+        <button class="magical-btn" style="animation: gradientShift 3s ease infinite;" onclick="startTest()">Testni Boshlash</button>
     </div>
 
     <div id="q1" class="question-container">
@@ -108,8 +171,8 @@
         <button class="option-btn" onclick="selectOption(1, 'Ravenclaw', this)">C) Qadimgi yozuvlar tushirilgan noma'lum so'qmoqni</button>
         <button class="option-btn" onclick="selectOption(1, 'Gryffindor', this)">D) Qanday xavf bo'lmasin, tavakkal qilib to'g'riga yuraman</button>
         <div class="nav-controls">
-            <button class="nav-btn back-btn" style="visibility: hidden;">⬅️ Orqaga</button>
-            <button id="next1" class="nav-btn next-btn" disabled onclick="nextQuestion(1)">Keyingisi ➡️</button>
+            <button class="nav-btn back-btn" style="visibility: hidden;">Orqaga</button>
+            <button id="next1" class="nav-btn next-btn" disabled onclick="nextQuestion(1)">Keyingisi</button>
         </div>
     </div>
 
@@ -121,8 +184,8 @@
         <button class="option-btn" onclick="selectOption(2, 'Hufflepuff', this)">C) "Eng mehribon va adolatli"</button>
         <button class="option-btn" onclick="selectOption(2, 'Gryffindor', this)">D) "Eng jasur va qahramon"</button>
         <div class="nav-controls">
-            <button class="nav-btn back-btn" onclick="prevQuestion(2)">⬅️ Orqaga</button>
-            <button id="next2" class="nav-btn next-btn" disabled onclick="nextQuestion(2)">Keyingisi ➡️</button>
+            <button class="nav-btn back-btn" onclick="prevQuestion(2)">Orqaga</button>
+            <button id="next2" class="nav-btn next-btn" disabled onclick="nextQuestion(2)">Keyingisi</button>
         </div>
     </div>
 
@@ -134,8 +197,8 @@
         <button class="option-btn" onclick="selectOption(3, 'Hufflepuff', this)">C) Imtihondan so'ng unga birga tayyorlanishni taklif qilaman</button>
         <button class="option-btn" onclick="selectOption(3, 'Gryffindor', this)">D) O'qituvchi ko'rmasdan oldin uni yashirishga yordam beraman</button>
         <div class="nav-controls">
-            <button class="nav-btn back-btn" onclick="prevQuestion(3)">⬅️ Orqaga</button>
-            <button id="next3" class="nav-btn next-btn" disabled onclick="nextQuestion(3)">Keyingisi ➡️</button>
+            <button class="nav-btn back-btn" onclick="prevQuestion(3)">Orqaga</button>
+            <button id="next3" class="nav-btn next-btn" disabled onclick="nextQuestion(3)">Keyingisi</button>
         </div>
     </div>
 
@@ -147,8 +210,8 @@
         <button class="option-btn" onclick="selectOption(4, 'Slytherin', this)">C) Barcha tillarda gaplashish imkonini beruvchi uzuk</button>
         <button class="option-btn" onclick="selectOption(4, 'Hufflepuff', this)">D) Har qanday kasallikni davolovchi tumor</button>
         <div class="nav-controls">
-            <button class="nav-btn back-btn" onclick="prevQuestion(4)">⬅️ Orqaga</button>
-            <button id="next4" class="nav-btn next-btn" disabled onclick="nextQuestion(4)">Keyingisi ➡️</button>
+            <button class="nav-btn back-btn" onclick="prevQuestion(4)">Orqaga</button>
+            <button id="next4" class="nav-btn next-btn" disabled onclick="nextQuestion(4)">Keyingisi</button>
         </div>
     </div>
 
@@ -160,23 +223,23 @@
         <button class="option-btn" onclick="selectOption(5, 'Slytherin', this)">C) Yordam chaqirish uchun xavfsiz joyga qochaman</button>
         <button class="option-btn" onclick="selectOption(5, 'Hufflepuff', this)">D) Do'stimning yonida qolib, oxirigacha himoya qilaman</button>
         <div class="nav-controls">
-            <button class="nav-btn back-btn" onclick="prevQuestion(5)">⬅️ Orqaga</button>
-            <button id="next5" class="nav-btn next-btn" disabled onclick="nextQuestion(5)">Natijani ko'rish 🪄</button>
+            <button class="nav-btn back-btn" onclick="prevQuestion(5)">Orqaga</button>
+            <button id="next5" class="nav-btn next-btn" disabled onclick="nextQuestion(5)">Natijani Ko'rish</button>
         </div>
     </div>
 
     <div id="loading-screen" class="question-container">
-        <span class="loading-spinner">⚙️</span>
-        <h2 style="text-align: center; color: #ffb100;">Shlyapa o'ylamoqda...</h2>
-        <p style="text-align: center; color: #ccc;">Sizning javoblaringiz tahlil qilinmoqda. Iltimos kuting.</p>
+        <span class="loading-spinner">⏳</span>
+        <h2 style="text-align: center; color: #ffd700;">Shlyapa o'ylamoqda...</h2>
+        <p style="text-align: center; color: #ccc;">Sizning xarakteringiz tahlil qilinmoqda...</p>
     </div>
 
-    <div id="result-screen" class="question-container">
+    <div id="result-screen" class="question-container intro-box">
         <p class="result-title">Sizning fakultetingiz:</p>
         <img id="result-image" src="" alt="Fakultet gerbi" class="result-image">
         <h1 id="result-house-name" class="result-house-name">Loading...</h1>
-        <p style="text-align: center; color: #ccc; font-size: 13px; padding: 0 10px;">Natijangiz saqlanishi va guruhga yuborilishi uchun pastdagi tugmani bosing!</p>
-        <button class="submit-btn" onclick="sendToBot()">Natijani Tasdiqlash va Botga Yuborish 📨</button>
+        <p style="text-align: center; color: #bbb; font-size: 14px; margin-top: 15px;">Fakultetni tasdiqlash uchun tugmani bosing!</p>
+        <button class="magical-btn submit-btn" onclick="sendToBot()">Tasdiqlash 📨</button>
     </div>
 
     <script>
@@ -185,6 +248,7 @@
 
         let userChoices = [null, null, null, null, null]; 
         let finalHouseResult = '';
+        let finalScores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
 
         const houseDataConfig = {
             'Gryffindor': { 'img': 'Gryffindor_crest.png', 'color': '#ae0001' },
@@ -200,7 +264,6 @@
             }
         }
 
-        // YANGI: Testni boshlash funksiyasi
         function startTest() {
             document.getElementById('intro-screen').classList.remove('active');
             document.getElementById('q1').classList.add('active');
@@ -222,10 +285,7 @@
             if (nextQ <= 5) {
                 document.getElementById('q' + nextQ).classList.add('active');
             } else {
-                // YANGI: Natijani birdaniga emas, Kutish (Loading) ekranini ko'rsatamiz
                 document.getElementById('loading-screen').classList.add('active');
-                
-                // 2.5 soniya (2500 millisoniya) kutib, keyin natijani chiqaramiz
                 setTimeout(calculateAndShowResult, 2500); 
             }
         }
@@ -235,14 +295,11 @@
             document.getElementById('q' + (qNum - 1)).classList.add('active');
         }
 
-        // Global o'zgaruvchilarga ballarni ham qo'shamiz
-        let finalScores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
-
         function calculateAndShowResult() {
             let scores = { Gryffindor: 0, Slytherin: 0, Ravenclaw: 0, Hufflepuff: 0 };
             userChoices.forEach(choice => { if(choice) scores[choice]++; });
             
-            finalScores = scores; // Buni botga yuborish uchun saqlab qo'yamiz
+            finalScores = scores; 
             
             let maxScore = 0;
             let finalHouse = 'Gryffindor'; 
@@ -257,8 +314,11 @@
             document.getElementById('result-image').src = config.img;
             
             let submitBtn = document.querySelector('.submit-btn');
-            submitBtn.innerText = finalHouse + " fakultetini qabul qilish 🪄";
-            submitBtn.style.backgroundColor = config.color;
+            submitBtn.innerText = finalHouse + " qabul qilish";
+            
+            // Tugmaga sehrli gradient va fakultet rangi aralashmasini beramiz
+            submitBtn.style.background = `linear-gradient(45deg, #111, ${config.color}, #111)`;
+            submitBtn.style.color = "#fff";
             
             document.getElementById('loading-screen').classList.remove('active');
             document.getElementById('result-screen').classList.add('active');
@@ -272,10 +332,7 @@
             submitBtn.style.animation = "none";
             submitBtn.style.cursor = "not-allowed";
 
-            const botUsername = "taqsimlovchibot"; // O'zingning boting
-            
-            // MUHIM O'ZGARISH: Natija bilan birga ballarni ham yuboramiz
-            // Format: res_Gryffindor_3_1_1_0 (Asosiy_G_S_R_H)
+            const botUsername = "taqsimlovchibot"; 
             let payload = `res_${finalHouseResult}_${finalScores.Gryffindor}_${finalScores.Slytherin}_${finalScores.Ravenclaw}_${finalScores.Hufflepuff}`;
             
             tg.openTelegramLink(`https://t.me/${botUsername}?start=${payload}`);
@@ -285,8 +342,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
